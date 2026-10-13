@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TFEX + ค่าเงินบาท Generator</title>
+<style>
+  :root {
+    --ink: #0B1F3A;
+    --muted: #64748B;
+    --green: #1A9E3F;
+    --red: #D32F2F;
+    --bg: #F4F6F9;
+    --paper: #FFFFFF;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Thai", sans-serif;
+    background: #f8f9fb;
+    color: var(--ink);
+    margin: 0;
+    padding: 24px;
+    line-height: 1.5;
+  }
+  .container { max-width: 1100px; margin: 0 auto; }
+  h1 { font-size: 28px; margin: 0 0 8px; }
+  h2.section { font-size: 22px; margin: 32px 0 12px; padding-bottom: 6px; border-bottom: 2px solid #e2e8f0; }
+  .subtitle { color: var(--muted); margin-bottom: 24px; }
+  .alert {
+    background: #fff8e1;
+    border-left: 4px solid #f59e0b;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 24px;
+    font-size: 14px;
+    color: #92400e;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  .card {
+    background: var(--paper);
+    border-radius: 12px;
+    padding: 20px;
+    border-left: 5px solid var(--green);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+  .card.short { border-left-color: var(--red); }
+  .card.neutral { border-left-color: #94a3b8; }
+  .card h3 { margin: 0 0 12px; font-size: 18px; }
+  label { display: block; font-size: 13px; color: var(--muted); margin-top: 10px; }
+  input, select, textarea.small {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 15px;
+    margin-top: 4px;
+    font-family: inherit;
+  }
+  textarea.small { min-height: 52px; resize: vertical; }
+  .dir { display: flex; gap: 12px; margin-top: 8px; }
+  .dir label { margin: 0; display: flex; align-items: center; gap: 6px; cursor: pointer; }
+  .actions { display: flex; gap: 12px; margin: 20px 0; flex-wrap: wrap; }
+  button {
+    background: var(--ink);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 15px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  button:hover { opacity: 0.9; }
+  button.secondary { background: #64748B; }
+  textarea#output {
+    width: 100%;
+    min-height: 320px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12px;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    background: #0f172a;
+    color: #e2e8f0;
+  }
+  .preview { margin-top: 28px; }
+  .preview h2 { font-size: 20px; margin-bottom: 12px; }
+  .note { font-size: 13px; color: var(--muted); margin-top: 12px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>📌 TFEX + 💱 ค่าเงินบาท Generator</h1>
+  <p class="subtitle">กรอกตัวเลขทุกวัน แล้วกดสร้างโค้ด WordPress ทั้งสองส่วนได้เลย</p>
+
+  <div class="alert">
+    <strong>วันนี้ตลาดหุ้นไทยและ TFEX หยุดทำการ</strong> — สภาพคล่องเงินบาทในประเทศอาจบางลง ราคาจึงอาจเคลื่อนไหวตามตลาดต่างประเทศ ควรระวังการแกว่งตัว
+  </div>
+
+  <!-- ========== TFEX ========== -->
+  <h2 class="section">📌 TFEX Strategy <span style="font-size:14px;color:#64748B;font-weight:400;">(ตลาดปิด — ค่าเดิม)</span></h2>
+  <div class="grid" id="tfex-cards">
+    <div class="card" data-id="s50">
+      <h3>S50Z2026</h3>
+      <label>ชื่อสัญญา</label>
+      <input type="text" class="name" value="S50Z2026">
+      <label>ทิศทาง</label>
+      <div class="dir">
+        <label><input type="radio" name="dir_s50" value="LONG" checked> ▲ LONG</label>
+        <label><input type="radio" name="dir_s50" value="SHORT"> ▼ SHORT</label>
+        <label><input type="radio" name="dir_s50" value="NEUTRAL"> — Sideway</label>
+      </div>
+      <label>กลยุทธ์</label>
+      <textarea class="small strategy">Breakout / Follow trend</textarea>
+      <label>Target</label>
+      <input type="text" class="target" value="1,060">
+      <label>Cut Loss</label>
+      <input type="text" class="cutloss" value="1,043">
+      <label>แนวต้าน</label>
+      <input type="text" class="resistance" value="1,052/1,057">
+      <label>แนวรับ</label>
+      <input type="text" class="support" value="1,045/1,040">
+    </div>
+
+    <div class="card short" data-id="usd">
+      <h3>USDZ2026</h3>
+      <label>ชื่อสัญญา</label>
+      <input type="text" class="name" value="USDZ2026">
+      <label>ทิศทาง</label>
+      <div class="dir">
+        <label><input type="radio" name="dir_usd" value="LONG"> ▲ LONG</label>
+        <label><input type="radio" name="dir_usd" value="SHORT" checked> ▼ SHORT</label>
+        <label><input type="radio" name="dir_usd" value="NEUTRAL"> — Sideway</label>
+      </div>
+      <label>กลยุทธ์</label>
+      <textarea class="small strategy">Sell on Rally</textarea>
+      <label>Target</label>
+      <input type="text" class="target" value="33.19">
+      <label>Cut Loss</label>
+      <input type="text" class="cutloss" value="33.34">
+      <label>แนวต้าน</label>
+      <input type="text" class="resistance" value="33.30/33.33">
+      <label>แนวรับ</label>
+      <input type="text" class="support" value="33.25/33.20">
+    </div>
+
+    <div class="card" data-id="go">
+      <h3>GOZ2026</h3>
+      <label>ชื่อสัญญา</label>
+      <input type="text" class="name" value="GOZ2026">
+      <label>ทิศทาง</label>
+      <div class="dir">
+        <label><input type="radio" name="dir_go" value="LONG" checked> ▲ LONG</label>
+        <label><input type="radio" name="dir_go" value="SHORT"> ▼ SHORT</label>
+        <label><input type="radio" name="dir_go" value="NEUTRAL"> — Sideway</label>
+      </div>
+      <label>กลยุทธ์</label>
+      <textarea class="small strategy">Buy on Dip</textarea>
+      <label>Target</label>
+      <input type="text" class="target" value="4,285">
+      <label>Cut Loss</label>
+      <input type="text" class="cutloss" value="4,215">
+      <label>แนวต้าน</label>
+      <input type="text" class="resistance" value="4,260/4,285">
+      <label>แนวรับ</label>
+      <input type="text" class="support" value="4,244/4,236">
+    </div>
+  </div>
+
+  <!-- ========== THB ========== -->
+  <h2 class="section">💱 ค่าเงินบาท (THB) — อัปเดตวันนี้</h2>
+  <div class="grid" id="thb-cards">
+    <div class="card neutral" data-id="usdthb">
+      <h3>🇺🇸 USDTHB</h3>
+      <label>ชื่อ (พร้อมธง)</label>
+      <input type="text" class="name" value="🇺🇸 USDTHB">
+      <label>ทิศทาง</label>
+      <div class="dir">
+        <label><input type="radio" name="dir_usdthb" value="BUY" checked> ▲ BUY</label>
+        <label><input type="radio" name="dir_usdthb" value="SELL"> ▼ SELL</label>
+        <label><input type="radio" name="dir_usdthb" value="NEUTRAL"> — Sideway</label>
+      </div>
+      <label>กลยุทธ์</label>
+      <textarea class="small strategy">Buy on Dip</textarea>
+      <label>แนวรับ</label>
+      <input type="text" class="support" value="33.60/33.57">
+      <label>แนวต้าน</label>
+      <input type="text" class="resistance" value="33.65/33.70">
+      <label>Target</label>
+      <input type="text" class="target" value="33.57">
+      <label>Cut Loss</label>
+      <input type="text" class="cutloss" value="33.71">
+    </div>
+
+    <div class="card neutral" data-id="eurthb">
+      <h3>🇪🇺 EURTHB</h3>
+      <label>ชื่อ (พร้อมธง)</label>
+      <input type="text" class="name" value="🇪🇺 EURTHB">
+      <label>ทิศทาง</label>
+      <div class="dir">
+        <label><input type="radio" name="dir_eurthb" value="BUY"> ▲ BUY</label>
+        <label><input type="radio" name="dir_eurthb" value="SELL" checked> ▼ SELL</label>
+        <label><input type="radio" name="dir_eurthb" value="NEUTRAL"> — Sideway</label>
+      </div>
+      <label>กลยุทธ์</label>
+      <textarea class="small strategy">Sell on Rally</textarea>
+      <label>แนวรับ</label>
+      <input type="text" class="support" value="37.45/37.42">
+      <label>แนวต้าน</label>
+      <input type="text" class="resistance" value="37.55/37.60">
+      <label>Target</label>
+      <input type="text" class="target" value="37.42">
+      <label>Cut Loss</label>
+      <input type="text" class="cutloss" value="37.62">
+    </div>
+
+    <div class="card neutral" data-id="audthb">
+      <h3>🇦🇺 AUDTHB</h3>
+      <label>ชื่อ (พร้อมธง)</label>
+      <input type="text" class="name" value="🇦🇺 AUDTHB">
+      <label>ทิศทาง</label>
+      <div class="dir">
+        <label><input type="radio" name="dir_audthb" value="BUY"> ▲ BUY</label>
+        <label><input type="radio" name="dir_audthb" value="SELL" checked> ▼ SELL</label>
+        <label><input type="radio" name="dir_audthb" value="NEUTRAL"> — Sideway</label>
+      </div>
+      <label>กลยุทธ์</label>
+      <textarea class="small strategy">Sell on Rally</textarea>
+      <label>แนวรับ</label>
+      <input type="text" class="support" value="23.36">
+      <label>แนวต้าน</label>
+      <input type="text" class="resistance" value="23.39/23.42">
+      <label>Target</label>
+      <input type="text" class="target" value="23.35">
+      <label>Cut Loss</label>
+      <input type="text" class="cutloss" value="23.43">
+    </div>
+
+    <div class="card neutral" data-id="gbpthb">
+      <h3>🇬🇧 GBPTHB</h3>
+      <label>ชื่อ (พร้อมธง)</label>
+      <input type="text" class="name" value="🇬🇧 GBPTHB">
+      <label>ทิศทาง</label>
+      <div class="dir">
+        <label><input type="radio" name="dir_gbpthb" value="BUY"> ▲ BUY</label>
+        <label><input type="radio" name="dir_gbpthb" value="SELL" checked> ▼ SELL</label>
+        <label><input type="radio" name="dir_gbpthb" value="NEUTRAL"> — Sideway</label>
+      </div>
+      <label>กลยุทธ์</label>
+      <textarea class="small strategy">Sell on Rally</textarea>
+      <label>แนวรับ</label>
+      <input type="text" class="support" value="44.39/44.36">
+      <label>แนวต้าน</label>
+      <input type="text" class="resistance" value="44.43/44.45">
+      <label>Target</label>
+      <input type="text" class="target" value="44.36">
+      <label>Cut Loss</label>
+      <input type="text" class="cutloss" value="44.46">
+    </div>
+
+    <div class="card neutral" data-id="chfthb">
+      <h3>🇨🇭 CHFTHB</h3>
+      <label>ชื่อ (พร้อมธง)</label>
+      <input type="text" class="name" value="🇨🇭 CHFTHB">
+      <label>ทิศทาง</label>
+      <div class="dir">
+        <label><input type="radio" name="dir_chfthb" value="BUY"> ▲ BUY</label>
+        <label><input type="radio" name="dir_chfthb" value="SELL" checked> ▼ SELL</label>
+        <label><input type="radio" name="dir_chfthb" value="NEUTRAL"> — Sideway</label>
+      </div>
+      <label>กลยุทธ์</label>
+      <textarea class="small strategy">Sell on Rally</textarea>
+      <label>แนวรับ</label>
+      <input type="text" class="support" value="40.28/40.25">
+      <label>แนวต้าน</label>
+      <input type="text" class="resistance" value="40.35/40.40">
+      <label>Target</label>
+      <input type="text" class="target" value="40.25">
+      <label>Cut Loss</label>
+      <input type="text" class="cutloss" value="40.41">
+    </div>
+
+    <div class="card neutral" data-id="note">
+      <h3>⚠️ หมายเหตุ</h3>
+      <label>หัวข้อ</label>
+      <input type="text" class="name" value="⚠️ หมายเหตุ">
+      <label>ข้อความหลัก</label>
+      <textarea class="small strategy">สภาพคล่องบาง</textarea>
+      <label>บรรทัดที่ 1</label>
+      <input type="text" class="support" value="ระวังแกว่งตัว">
+      <label>บรรทัดที่ 2</label>
+      <input type="text" class="resistance" value="ตามต่างประเทศ">
+      <label>บรรทัดที่ 3</label>
+      <input type="text" class="target" value="ตลาดปิด">
+      <label>บรรทัดที่ 4</label>
+      <input type="text" class="cutloss" value="วันนี้">
+    </div>
+  </div>
+
+  <div class="actions">
+    <button onclick="generate()">สร้างโค้ด WordPress</button>
+    <button class="secondary" onclick="copyCode()">คัดลอกโค้ด</button>
+  </div>
+
+  <textarea id="output" readonly placeholder="โค้ดจะปรากฏที่นี่..."></textarea>
+  <p class="note">วิธีใช้: แก้ตัวเลขในช่องด้านบน (โค้ดจะอัปเดตอัตโนมัติ) → กดคัดลอก → วางใน WordPress Code Editor</p>
+
+  <div class="preview">
+    <h2>ตัวอย่างผลลัพธ์</h2>
+    <div id="preview"></div>
+  </div>
+</div>
+
+<script>
+function getTfexData(card) {
+  const id = card.dataset.id;
+  const dir = card.querySelector(`input[name="dir_${id}"]:checked`).value;
+  return {
+    name: card.querySelector('.name').value.trim(),
+    dir,
+    strategy: card.querySelector('.strategy') ? card.querySelector('.strategy').value.trim() : '',
+    target: card.querySelector('.target').value.trim(),
+    cutloss: card.querySelector('.cutloss').value.trim(),
+    resistance: card.querySelector('.resistance').value.trim(),
+    support: card.querySelector('.support').value.trim()
+  };
+}
+
+function getThbData(card) {
+  const id = card.dataset.id;
+  let dir = 'SELL';
+  const dirRadio = card.querySelector(`input[name="dir_${id}"]:checked`);
+  if (dirRadio) dir = dirRadio.value;
+  return {
+    name: card.querySelector('.name').value.trim(),
+    dir,
+    strategy: card.querySelector('.strategy') ? card.querySelector('.strategy').value.trim() : '',
+    support: card.querySelector('.support').value.trim(),
+    resistance: card.querySelector('.resistance').value.trim(),
+    target: card.querySelector('.target').value.trim(),
+    cutloss: card.querySelector('.cutloss').value.trim()
+  };
+}
+
+function makeTfexCard(data) {
+  const isLong = data.dir === 'LONG';
+  const isNeutral = data.dir === 'NEUTRAL';
+  const borderColor = isNeutral ? '#F59E0B' : (isLong ? '#1A9E3F' : '#D32F2F');
+  const dirColor = borderColor;
+  const dirText = isNeutral ? '— Sideway' : (isLong ? '▲ LONG' : '▼ SHORT');
+  const targetColor = '#1A9E3F';
+  const strategyLine = data.strategy ? `
+<!-- wp:paragraph {"style":{"color":{"text":"${dirColor}"},"typography":{"fontSize":"14px","fontWeight":"700"},"spacing":{"margin":{"top":"0","bottom":"0"}}}} -->
+<p class="has-text-color" style="color:${dirColor};margin-top:0;margin-bottom:0;font-size:14px;font-weight:700"><strong>${data.strategy}</strong></p>
+<!-- /wp:paragraph -->` : '';
+
+  return `<!-- wp:column -->
+<div class="wp-block-column"><!-- wp:group {"style":{"color":{"background":"#F4F6F9"},"border":{"radius":"12px","left":{"width":"5px","style":"solid","color":"${borderColor}"}},"spacing":{"padding":{"top":"20px","right":"20px","bottom":"20px","left":"20px"},"margin":{"top":"0","bottom":"0"},"blockGap":"8px"}},"layout":{"type":"default"}} -->
+<div class="wp-block-group has-background" style="border-radius:12px;border-left-color:${borderColor};border-left-style:solid;border-left-width:5px;background-color:#F4F6F9;margin-top:0;margin-bottom:0;padding-top:20px;padding-right:20px;padding-bottom:20px;padding-left:20px"><!-- wp:paragraph {"style":{"color":{"text":"#0B1F3A"},"typography":{"fontSize":"20px"},"spacing":{"margin":{"top":"0","bottom":"0"}}}} -->
+<p class="has-text-color" style="color:#0B1F3A;margin-top:0;margin-bottom:0;font-size:20px"><strong>${data.name}</strong></p>
+<!-- /wp:paragraph -->
+<!-- wp:paragraph {"style":{"color":{"text":"${dirColor}"},"typography":{"fontSize":"14px","fontWeight":"700"},"spacing":{"margin":{"top":"0","bottom":"0"}}}} -->
+<p class="has-text-color" style="color:${dirColor};margin-top:0;margin-bottom:0;font-size:14px;font-weight:700"><strong>${dirText}</strong></p>
+<!-- /wp:paragraph -->${strategyLine}
+<!-- wp:paragraph {"style":{"color":{"text":"#64748B"},"typography":{"fontSize":"15px","lineHeight":"1.4"},"spacing":{"margin":{"top":"0","bottom":"0"}}}} -->
+<p class="has-text-color" style="color:#64748B;margin-top:0;margin-bottom:0;font-size:15px;line-height:1.4">Target<br><strong style="color:${targetColor};font-size:20px;white-space:nowrap">${data.target}</strong></p>
+<!-- /wp:paragraph -->
+<!-- wp:paragraph {"style":{"color":{"text":"#64748B"},"typography":{"fontSize":"15px","lineHeight":"1.4"},"spacing":{"margin":{"top":"0","bottom":"0"}}}} -->
+<p class="has-text-color" style="color:#64748B;margin-top:0;margin-bottom:0;font-size:15px;line-height:1.4">Cut Loss<br><strong style="color:#D32F2F;font-size:20px;white-space:nowrap">${data.cutloss}</strong></p>
+<!-- /wp:paragraph -->
+<!-- wp:paragraph {"style":{"color":{"text":"#64748B"},"typography":{"fontSize":"15px","lineHeight":"1.4"},"spacing":{"margin":{"top":"0","bottom":"0"}}}} -->
+<p class="has-text-color" style="color:#64748B;margin-top:0;margin-bottom:0;font-size:15px;line-height:1.4">แนวต้าน<br><strong style="color:#0B1F3A;font-size:20px;white-space:nowrap">${data.resistance}</strong></p>
+<!-- /wp:paragraph -->
+<!-- wp:paragraph {"style":{"color":{"text":"#64748B"},"typography":{"fontSize":"15px","lineHeight":"1.4"},"spacing":{"margin":{"top":"0","bottom":"0"}}}} -->
+<p class="has-text-color" style="color:#64748B;margin-top:0;margin-bottom:0;font-size:15px;line-height:1.4">แนวรับ<br><strong style="color:#0B1F3A;font-size:20px;white-space:nowrap">${data.support}</strong></p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group --></div>
+<!-- /wp:column -->`;
+}
+
+function makeThbCard(data) {
+  const isBuy = data.dir === 'BUY';
+  const isNeutral = data.dir === 'NEUTRAL';
+  const borderColor = isNeutral ? '#F59E0B' : (isBuy ? '#1A9E3F' : '#D32F2F');
+  const strategyColor = borderColor;
+  const dirText = isNeutral ? '— Sideway' : (isBuy ? '▲ BUY' : '▼ SELL');
+
+  return `<!-- wp:column -->
+<div class="wp-block-column"><!-- wp:group {"style":{"color":{"background":"#F4F6F9"},"border":{"radius":"12px","left":{"width":"5px","style":"solid","color":"${borderColor}"}},"spacing":{"padding":{"top":"20px","right":"20px","bottom":"20px","left":"20px"},"margin":{"top":"0","bottom":"0"},"blockGap":"8px"}},"layout":{"type":"default"}} -->
+<div class="wp-block-group has-background" style="border-radius:12px;border-left-color:${borderColor};border-left-style:solid;border-left-width:5px;background-color:#F4F6F9;margin-top:0;margin-bottom:0;padding-top:20px;padding-right:20px;padding-bottom:20px;padding-left:20px"><!-- wp:paragraph {"style":{"color":{"text":"#0B1F3A"},"typography":{"fontSize":"20px"},"spacing":{"margin":{"top":"0","bottom":"0"}}}} -->
+<p class="has-text-color" style="color:#0B1F3A;margin-top:0;margin-bottom:0;font-size:20px"><strong>${data.name}</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph {"style":{"color":{"text":"${strategyColor}"},"typography":{"fontSize":"14px","fontWeight":"700"},"spacing":{"margin":{"top":"0","bottom":"0"}}}} -->
+<p class="has-text-color" style="color:${strategyColor};margin-top:0;margin-bottom:0;font-size:14px;font-weight:700"><strong>${dirText}</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph {"style":{"color":{"text":"${strategyColor}"},"typography":{"fontSize":"14px","fontWeight":"700"},"spacing":{"margin":{"top":"0","bottom":"0"}}}} -->
+<p class="has-text-color" style="color:${strategyColor};margin-top:0;margin-bottom:0;font-size:14px;font-weight:700"><strong>${data.strategy}</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph {"style":{"color":{"text":"#64748B"},"typography":{"fontSize":"15px","lineHeight":"1.4"},"spacing":{"margin":{"top":"0","bottom":"0"}}}} -->
+<p class="has-text-color" style="color:#64748B;margin-top:0;margin-bottom:0;font-size:15px;line-height:1.4">แนวรับ<br><strong style="color:#0B1F3A;font-size:20px;white-space:nowrap">${data.support}</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph {"style":{"color":{"text":"#64748B"},"typography":{"fontSize":"15px","lineHeight":"1.4"},"spacing":{"margin":{"top":"0","bottom":"0"}}}} -->
+<p class="has-text-color" style="color:#64748B;margin-top:0;margin-bottom:0;font-size:15px;line-height:1.4">แนวต้าน<br><strong style="color:#0B1F3A;font-size:20px;white-space:nowrap">${data.resistance}</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph {"style":{"color":{"text":"#64748B"},"typography":{"fontSize":"15px","lineHeight":"1.4"},"spacing":{"margin":{"top":"0","bottom":"0"}}}} -->
+<p class="has-text-color" style="color:#64748B;margin-top:0;margin-bottom:0;font-size:15px;line-height:1.4">Target<br><strong style="color:#1A9E3F;font-size:20px;white-space:nowrap">${data.target}</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph {"style":{"color":{"text":"#64748B"},"typography":{"fontSize":"15px","lineHeight":"1.4"},"spacing":{"margin":{"top":"0","bottom":"0"}}}} -->
+<p class="has-text-color" style="color:#64748B;margin-top:0;margin-bottom:0;font-size:15px;line-height:1.4">Cut Loss<br><strong style="color:#D32F2F;font-size:20px;white-space:nowrap">${data.cutloss}</strong></p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group --></div>
+<!-- /wp:column -->`;
+}
+
+function makeNoteCard(data) {
+  return `<!-- wp:column -->
+<div class="wp-block-column"><!-- wp:group {"style":{"color":{"background":"#FFF8E1"},"border":{"radius":"12px","left":{"width":"5px","style":"solid","color":"#F59E0B"}},"spacing":{"padding":{"top":"20px","right":"20px","bottom":"20px","left":"20px"},"margin":{"top":"0","bottom":"0"},"blockGap":"8px"}},"layout":{"type":"default"}} -->
+<div class="wp-block-group has-background" style="border-radius:12px;border-left-color:#F59E0B;border-left-style:solid;border-left-width:5px;background-color:#FFF8E1;margin-top:0;margin-bottom:0;padding-top:20px;padding-right:20px;padding-bottom:20px;padding-left:20px"><!-- wp:paragraph {"style":{"color":{"text":"#0B1F3A"},"typography":{"fontSize":"20px"},"spacing":{"margin":{"top":"0","bottom":"0"}}}} -->
+<p class="has-text-color" style="color:#0B1F3A;margin-top:0;margin-bottom:0;font-size:20px"><strong>${data.name}</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph {"style":{"color":{"text":"#D32F2F"},"typography":{"fontSize":"14px","fontWeight":"700"},"spacing":{"margin":{"top":"0","bottom":"0"}}}} -->
+<p class="has-text-color" style="color:#D32F2F;margin-top:0;margin-bottom:0;font-size:14px;font-weight:700"><strong>${data.strategy}</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph {"style":{"color":{"text":"#64748B"},"typography":{"fontSize":"15px","lineHeight":"1.4"},"spacing":{"margin":{"top":"0","bottom":"0"}}}} -->
+<p class="has-text-color" style="color:#64748B;margin-top:0;margin-bottom:0;font-size:15px;line-height:1.4"><strong style="color:#0B1F3A;font-size:18px">${data.support}</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph {"style":{"color":{"text":"#64748B"},"typography":{"fontSize":"15px","lineHeight":"1.4"},"spacing":{"margin":{"top":"0","bottom":"0"}}}} -->
+<p class="has-text-color" style="color:#64748B;margin-top:0;margin-bottom:0;font-size:15px;line-height:1.4"><strong style="color:#0B1F3A;font-size:18px">${data.resistance}</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph {"style":{"color":{"text":"#64748B"},"typography":{"fontSize":"15px","lineHeight":"1.4"},"spacing":{"margin":{"top":"0","bottom":"0"}}}} -->
+<p class="has-text-color" style="color:#64748B;margin-top:0;margin-bottom:0;font-size:15px;line-height:1.4"><strong style="color:#0B1F3A;font-size:18px">${data.target}</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph {"style":{"color":{"text":"#64748B"},"typography":{"fontSize":"15px","lineHeight":"1.4"},"spacing":{"margin":{"top":"0","bottom":"0"}}}} -->
+<p class="has-text-color" style="color:#64748B;margin-top:0;margin-bottom:0;font-size:15px;line-height:1.4"><strong style="color:#0B1F3A;font-size:18px">${data.cutloss}</strong></p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group --></div>
+<!-- /wp:column -->`;
+}
+
+function generate() {
+  // TFEX
+  const tfexCards = Array.from(document.querySelectorAll('#tfex-cards .card')).map(getTfexData);
+  const tfexColumns = tfexCards.map(makeTfexCard).join('\n');
+
+  const tfexHtml = `<!-- wp:heading {"style":{"color":{"text":"#0B1F3A"},"typography":{"fontSize":"26px","fontWeight":"700"},"spacing":{"margin":{"top":"40px","bottom":"0"}}}} -->
+<h2 class="wp-block-heading has-text-color" style="color:#0B1F3A;margin-top:40px;margin-bottom:0;font-size:26px;font-weight:700">📌 TFEX Strategy</h2>
+<!-- /wp:heading -->
+<!-- wp:paragraph {"style":{"color":{"text":"#64748B"},"typography":{"fontSize":"14px"},"spacing":{"margin":{"top":"4px","bottom":"0"}}}} -->
+<p class="has-text-color" style="color:#64748B;margin-top:4px;margin-bottom:0;font-size:14px">Target / Cut Loss</p>
+<!-- /wp:paragraph -->
+<!-- wp:columns {"style":{"spacing":{"blockGap":{"left":"16px","top":"16px"},"margin":{"top":"16px","bottom":"0"}}}} -->
+<div class="wp-block-columns" style="margin-top:16px;margin-bottom:0">${tfexColumns}</div>
+<!-- /wp:columns -->`;
+
+  // THB — split into 2 rows (3 + 3)
+  const thbCards = Array.from(document.querySelectorAll('#thb-cards .card')).map((card, idx) => {
+    const data = getThbData(card);
+    data.isNote = card.dataset.id === 'note';
+    return data;
+  });
+  const row1 = thbCards.slice(0, 3).map(makeThbCard).join('\n');
+  const row2 = thbCards.slice(3).map(d => d.isNote ? makeNoteCard(d) : makeThbCard(d)).join('\n');
+
+  const alertHtml = `<!-- wp:group {"style":{"color":{"background":"#FFF8E1"},"border":{"radius":"8px","left":{"width":"4px","style":"solid","color":"#F59E0B"}},"spacing":{"padding":{"top":"16px","right":"20px","bottom":"16px","left":"20px"},"margin":{"top":"24px","bottom":"0"}}},"layout":{"type":"default"}} -->
+<div class="wp-block-group has-background" style="border-radius:8px;border-left-color:#F59E0B;border-left-style:solid;border-left-width:4px;background-color:#FFF8E1;margin-top:24px;margin-bottom:0;padding-top:16px;padding-right:20px;padding-bottom:16px;padding-left:20px"><!-- wp:paragraph {"style":{"color":{"text":"#92400E"},"typography":{"fontSize":"15px","lineHeight":"1.5"},"spacing":{"margin":{"top":"0","bottom":"0"}}}} -->
+<p class="has-text-color" style="color:#92400E;margin-top:0;margin-bottom:0;font-size:15px;line-height:1.5"><strong>วันนี้ตลาดหุ้นไทยและ TFEX หยุดทำการ</strong> — สภาพคล่องเงินบาทในประเทศอาจบางลง ราคาจึงอาจเคลื่อนไหวตามตลาดต่างประเทศ ควรระวังการแกว่งตัว</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->`;
+
+  const thbHtml = `<!-- wp:heading {"style":{"color":{"text":"#0B1F3A"},"typography":{"fontSize":"26px","fontWeight":"700"},"spacing":{"margin":{"top":"40px","bottom":"0"}}}} -->
+<h2 class="wp-block-heading has-text-color" style="color:#0B1F3A;margin-top:40px;margin-bottom:0;font-size:26px;font-weight:700">💱 ค่าเงินบาท (THB)</h2>
+<!-- /wp:heading -->
+${alertHtml}
+<!-- wp:columns {"style":{"spacing":{"blockGap":{"left":"16px","top":"16px"},"margin":{"top":"16px","bottom":"0"}}}} -->
+<div class="wp-block-columns" style="margin-top:16px;margin-bottom:0">${row1}</div>
+<!-- /wp:columns -->
+<!-- wp:columns {"style":{"spacing":{"blockGap":{"left":"16px","top":"16px"},"margin":{"top":"16px","bottom":"0"}}}} -->
+<div class="wp-block-columns" style="margin-top:16px;margin-bottom:0">${row2}</div>
+<!-- /wp:columns -->`;
+
+  document.getElementById('output').value = tfexHtml + '\n\n' + thbHtml;
+
+  // Preview
+  let preview = '<h3 style="margin:16px 0 8px;">📌 TFEX Strategy</h3><div style="display:flex;gap:16px;flex-wrap:wrap;">';
+  tfexCards.forEach(d => {
+    const isLong = d.dir === 'LONG';
+    const isNeutral = d.dir === 'NEUTRAL';
+    const border = isNeutral ? '#F59E0B' : (isLong ? '#1A9E3F' : '#D32F2F');
+    const dirC = border;
+    const tC = isNeutral ? '#0B1F3A' : (isLong ? '#1A9E3F' : '#D32F2F');
+    const dirText = isNeutral ? '— Sideway' : (isLong ? '▲ LONG' : '▼ SHORT');
+    preview += `<div style="flex:1;min-width:200px;background:#F4F6F9;border-radius:12px;border-left:5px solid ${border};padding:16px;">
+      <div style="font-weight:700;font-size:18px;">${d.name}</div>
+      <div style="color:${dirC};font-weight:700;margin:6px 0;">${dirText}</div>
+      ${d.strategy ? `<div style="color:${dirC};font-weight:700;font-size:14px;margin-bottom:6px;">${d.strategy}</div>` : ''}
+      <div style="color:#64748B;font-size:14px;">Target<br><strong style="color:#1A9E3F;font-size:20px;">${d.target}</strong></div>
+      <div style="color:#64748B;font-size:14px;">Cut Loss<br><strong style="color:#D32F2F;font-size:20px;">${d.cutloss}</strong></div>
+      <div style="color:#64748B;font-size:14px;">แนวต้าน<br><strong style="color:#0B1F3A;font-size:20px;">${d.resistance}</strong></div>
+      <div style="color:#64748B;font-size:14px;">แนวรับ<br><strong style="color:#0B1F3A;font-size:20px;">${d.support}</strong></div>
+    </div>`;
+  });
+  preview += '</div>';
+
+  preview += '<h3 style="margin:24px 0 8px;">💱 ค่าเงินบาท (THB)</h3>';
+  preview += '<div style="background:#FFF8E1;border-left:4px solid #F59E0B;border-radius:8px;padding:14px 18px;margin-bottom:16px;color:#92400E;font-size:14px;"><strong>วันนี้ตลาดหุ้นไทยและ TFEX หยุดทำการ</strong> — สภาพคล่องเงินบาทในประเทศอาจบางลง ราคาจึงอาจเคลื่อนไหวตามตลาดต่างประเทศ ควรระวังการแกว่งตัว</div>';
+  preview += '<div style="display:flex;gap:16px;flex-wrap:wrap;">';
+  thbCards.forEach(d => {
+    if (d.isNote) {
+      preview += `<div style="flex:1;min-width:200px;background:#FFF8E1;border-radius:12px;border-left:5px solid #F59E0B;padding:16px;">
+        <div style="font-weight:700;font-size:18px;">${d.name}</div>
+        <div style="color:#D32F2F;font-weight:700;margin:6px 0;font-size:14px;">${d.strategy}</div>
+        <div style="color:#0B1F3A;font-size:16px;font-weight:600;margin-top:8px;">${d.support}</div>
+        <div style="color:#0B1F3A;font-size:16px;font-weight:600;">${d.resistance}</div>
+        <div style="color:#0B1F3A;font-size:16px;font-weight:600;">${d.target}</div>
+        <div style="color:#0B1F3A;font-size:16px;font-weight:600;">${d.cutloss}</div>
+      </div>`;
+    } else {
+      const isBuy = d.dir === 'BUY';
+      const isNeutral = d.dir === 'NEUTRAL';
+      const border = isNeutral ? '#F59E0B' : (isBuy ? '#1A9E3F' : '#D32F2F');
+      const stratC = border;
+      const dirText = isNeutral ? '— Sideway' : (isBuy ? '▲ BUY' : '▼ SELL');
+      preview += `<div style="flex:1;min-width:200px;background:#F4F6F9;border-radius:12px;border-left:5px solid ${border};padding:16px;">
+        <div style="font-weight:700;font-size:18px;">${d.name}</div>
+        <div style="color:${stratC};font-weight:700;margin:6px 0;font-size:14px;">${dirText}</div>
+        <div style="color:${stratC};font-weight:700;font-size:14px;margin-bottom:6px;">${d.strategy}</div>
+        <div style="color:#64748B;font-size:14px;">แนวรับ<br><strong style="color:#0B1F3A;font-size:20px;">${d.support}</strong></div>
+        <div style="color:#64748B;font-size:14px;">แนวต้าน<br><strong style="color:#0B1F3A;font-size:20px;">${d.resistance}</strong></div>
+        <div style="color:#64748B;font-size:14px;">Target<br><strong style="color:#1A9E3F;font-size:20px;">${d.target}</strong></div>
+        <div style="color:#64748B;font-size:14px;">Cut Loss<br><strong style="color:#D32F2F;font-size:20px;">${d.cutloss}</strong></div>
+      </div>`;
+    }
+  });
+  preview += '</div>';
+
+  document.getElementById('preview').innerHTML = preview;
+}
+
+function copyCode() {
+  const ta = document.getElementById('output');
+  ta.select();
+  document.execCommand('copy');
+  alert('คัดลอกโค้ดแล้ว!');
+}
+
+// Auto-generate when any input changes
+document.querySelectorAll('#tfex-cards input, #tfex-cards textarea, #thb-cards input, #thb-cards textarea').forEach(el => {
+  el.addEventListener('input', generate);
+  el.addEventListener('change', generate);
+});
+
+// Update THB card border + strategy text color in the form itself (based on radio)
+function updateThbCardColors() {
+  document.querySelectorAll('#thb-cards .card').forEach(card => {
+    if (card.dataset.id === 'note') return;
+    const dirRadio = card.querySelector('input[type="radio"]:checked');
+    if (!dirRadio) return;
+    const val = dirRadio.value;
+    const color = val === 'BUY' ? '#1A9E3F' : (val === 'NEUTRAL' ? '#F59E0B' : '#D32F2F');
+    card.style.borderLeftColor = color;
+    const strategyEl = card.querySelector('.strategy');
+    if (strategyEl) {
+      strategyEl.style.color = color;
+      strategyEl.style.fontWeight = '700';
+    }
+  });
+}
+
+document.querySelectorAll('#thb-cards input[type="radio"]').forEach(el => {
+  el.addEventListener('change', () => {
+    updateThbCardColors();
+    generate();
+  });
+});
+
+// Initial generate
+generate();
+updateThbCardColors();
+
+// Update TFEX card border on direction change
+document.querySelectorAll('#tfex-cards input[type="radio"]').forEach(radio => {
+  radio.addEventListener('change', (e) => {
+    const card = e.target.closest('.card');
+    const val = e.target.value;
+    const color = val === 'LONG' ? '#1A9E3F' : (val === 'NEUTRAL' ? '#F59E0B' : '#D32F2F');
+    card.style.borderLeftColor = color;
+    card.classList.toggle('short', val === 'SHORT');
+    generate();
+  });
+});
+</script>
+</body>
+</html>
