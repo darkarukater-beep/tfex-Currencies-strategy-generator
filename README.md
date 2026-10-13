@@ -1,0 +1,1 @@
+# tfex-Currencies-strategy-generator
